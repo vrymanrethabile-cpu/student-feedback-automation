@@ -1,0 +1,278 @@
+{
+  "name": "Student Feedback Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "student-feedback",
+        "responseMode": "responseNode",
+        "options": {},
+        "authentication": "none",
+        "csrf": {
+          "enabled": false
+        }
+      },
+      "id": "webhook-receive",
+      "name": "Receive Feedback",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        260,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            [
+              {
+                "value1": "={{ !!$json.studentName && !!$json.email && !!$json.courseName && !!$json.rating && !!$json.feedback }}",
+                "operation": "true",
+                "value2": ""
+              }
+            ]
+          ]
+        },
+        "combineOperation": "and"
+      },
+      "id": "validate-feedback",
+      "name": "Validate Data",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        520,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "status",
+              "value": "invalid"
+            },
+            {
+              "name": "message",
+              "value": "Missing required information. Please resubmit the form with all required fields."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "invalid-response",
+      "name": "Return Validation Error",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        820,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "{{ $env.GOOGLE_SHEET_ID }}",
+        "sheetName": "Feedback",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "studentName": "={{$json.studentName}}",
+            "email": "={{$json.email}}",
+            "courseName": "={{$json.courseName}}",
+            "rating": "={{$json.rating}}",
+            "feedback": "={{$json.feedback}}",
+            "submittedAt": "={{$json.submittedAt}}",
+            "status": "pending"
+          }
+        }
+      },
+      "id": "google-sheets",
+      "name": "Store Feedback in Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        820,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            [
+              {
+                "value1": "={{$json.rating}}",
+                "operation": "lte",
+                "value2": 2
+              }
+            ]
+          ]
+        },
+        "combineOperation": "and"
+      },
+      "id": "rating-check",
+      "name": "Check Rating",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "ratingStatus",
+              "value": "Needs Attention"
+            },
+            {
+              "name": "followUp",
+              "value": "Coach or trainer should review this comment and respond promptly."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "needs-attention",
+      "name": "Mark as Needs Attention",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1380,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "ratingStatus",
+              "value": "Positive Feedback"
+            },
+            {
+              "name": "followUp",
+              "value": "Share positive reinforcement with the student and keep the good momentum going."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "positive-feedback",
+      "name": "Mark as Positive Feedback",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1380,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "channel": "#student-feedback",
+        "text": "Thank you for your feedback! Your response has been received successfully.",
+        "username": "n8n Bot"
+      },
+      "id": "slack-notify",
+      "name": "Send Thank You Notification",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        1660,
+        220
+      ]
+    }
+  ],
+  "connections": {
+    "webhook-receive": {
+      "main": [
+        [
+          {
+            "node": "validate-feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "validate-feedback": {
+      "main": [
+        [
+          {
+            "node": "invalid-response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "google-sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "google-sheets": {
+      "main": [
+        [
+          {
+            "node": "rating-check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "rating-check": {
+      "main": [
+        [
+          {
+            "node": "needs-attention",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "positive-feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "needs-attention": {
+      "main": [
+        [
+          {
+            "node": "slack-notify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "positive-feedback": {
+      "main": [
+        [
+          {
+            "node": "slack-notify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": []
+}

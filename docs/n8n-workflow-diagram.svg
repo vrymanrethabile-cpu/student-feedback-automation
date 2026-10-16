@@ -1,0 +1,77 @@
+<svg width="1200" height="700" viewBox="0 0 1200 700" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Student Feedback Automation Workflow</title>
+  <desc id="desc">A workflow diagram showing the process from form submission to validation, Google Sheets storage, rating logic, and Slack notification.</desc>
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eef4ff"/>
+      <stop offset="100%" stop-color="#f5f3ff"/>
+    </linearGradient>
+    <style>
+      .title { font: 700 34px 'Segoe UI', Arial, sans-serif; fill: #111827; }
+      .label { font: 600 18px 'Segoe UI', Arial, sans-serif; fill: #1f2937; }
+      .small { font: 500 14px 'Segoe UI', Arial, sans-serif; fill: #4b5563; }
+      .node { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; }
+      .node-amber { fill: #fff7ed; stroke: #fdba74; }
+      .node-green { fill: #ecfdf5; stroke: #6ee7b7; }
+      .node-purple { fill: #f5f3ff; stroke: #c4b5fd; }
+      .node-blue { fill: #eff6ff; stroke: #93c5fd; }
+      .decision { fill: #fef3c7; stroke: #fbbf24; }
+      .arrow { stroke: #475569; stroke-width: 3; fill: none; marker-end: url(#arrowhead); }
+      .pill { fill: #111827; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="8" refX="10" refY="4" orient="auto">
+      <polygon points="0 0, 10 4, 0 8" fill="#475569"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="700" fill="url(#bg)"/>
+  <text x="50" y="60" class="title">Student Feedback Automation Workflow</text>
+
+  <rect x="80" y="110" width="210" height="110" rx="20" class="node node-blue"/>
+  <text x="100" y="155" class="label">1. Receive Feedback</text>
+  <text x="100" y="182" class="small">Webhook receives</text>
+  <text x="100" y="202" class="small">student form data</text>
+
+  <rect x="360" y="110" width="220" height="110" rx="20" class="node node-purple"/>
+  <text x="382" y="155" class="label">2. Validate Data</text>
+  <text x="382" y="182" class="small">Check required fields</text>
+  <text x="382" y="202" class="small">Name, email, course, rating</text>
+
+  <rect x="660" y="110" width="210" height="110" rx="20" class="node node-green"/>
+  <text x="680" y="155" class="label">3. Store Feedback</text>
+  <text x="680" y="182" class="small">Append to Google</text>
+  <text x="680" y="202" class="small">Sheets</text>
+
+  <rect x="925" y="110" width="210" height="110" rx="20" class="decision"/>
+  <text x="947" y="155" class="label">4. Rating Logic</text>
+  <text x="947" y="182" class="small">If rating ≤ 2</text>
+  <text x="947" y="202" class="small">Else positive path</text>
+
+  <rect x="360" y="360" width="220" height="110" rx="20" class="node node-amber"/>
+  <text x="382" y="405" class="label">Needs Attention</text>
+  <text x="382" y="432" class="small">Flag and review</text>
+  <text x="382" y="452" class="small">priority feedback</text>
+
+  <rect x="660" y="360" width="220" height="110" rx="20" class="node node-green"/>
+  <text x="682" y="405" class="label">Positive Feedback</text>
+  <text x="682" y="432" class="small">Keep as positive</text>
+  <text x="682" y="452" class="small">student experience</text>
+
+  <rect x="930" y="360" width="200" height="110" rx="20" class="node node-purple"/>
+  <text x="952" y="405" class="label">5. Notification</text>
+  <text x="952" y="432" class="small">Thank-you message</text>
+  <text x="952" y="452" class="small">through Slack</text>
+
+  <path d="M290 165 H360" class="arrow"/>
+  <path d="M580 165 H660" class="arrow"/>
+  <path d="M870 165 H925" class="arrow"/>
+  <path d="M1015 220 L1015 300 L470 300 L470 360" class="arrow"/>
+  <path d="M1015 220 L1015 300 L770 300 L770 360" class="arrow"/>
+  <path d="M1015 470 L1015 520 L1030 520" class="arrow"/>
+
+  <text x="520" y="290" class="small">Valid submission</text>
+  <text x="560" y="332" class="small">rating ≤ 2</text>
+  <text x="790" y="332" class="small">rating &gt; 2</text>
+
+</svg>
